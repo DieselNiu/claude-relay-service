@@ -1,4 +1,3 @@
-version: '3.8'
 
 # Claude Relay Service Docker Compose 配置
 # 所有配置通过环境变量设置，无需映射 .env 文件
@@ -9,9 +8,6 @@ services:
     build: .
     image: weishaw/claude-relay-service:latest
     restart: unless-stopped
-    ports:
-      # 绑定地址：生产环境建议使用反向代理，设置 BIND_HOST=127.0.0.1
-      - "${BIND_HOST:-0.0.0.0}:${PORT:-3000}:3000"
     environment:
       # 🌐 服务器配置
       - NODE_ENV=production
@@ -74,7 +70,7 @@ services:
     depends_on:
       - redis
     networks:
-      - claude-relay-network
+      - dokploy-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
       interval: 30s
@@ -95,7 +91,7 @@ services:
       - ./redis_data:/data
     command: redis-server --save 60 1 --appendonly yes --appendfsync everysec
     networks:
-      - claude-relay-network
+      - dokploy-network
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 30s
@@ -113,7 +109,7 @@ services:
     depends_on:
       - redis
     networks:
-      - claude-relay-network
+      - dokploy-network
     profiles:
       - monitoring
 
@@ -133,7 +129,7 @@ services:
       - '--web.console.templates=/etc/prometheus/consoles'
       - '--web.enable-lifecycle'
     networks:
-      - claude-relay-network
+      - dokploy-network
     profiles:
       - monitoring
 
@@ -151,7 +147,7 @@ services:
     depends_on:
       - prometheus
     networks:
-      - claude-relay-network
+      - dokploy-network
     profiles:
       - monitoring
 
@@ -162,5 +158,5 @@ volumes:
     driver: local
 
 networks:
-  claude-relay-network:
-    driver: bridge
+  dokploy-network:
+   external: true
