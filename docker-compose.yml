@@ -88,7 +88,7 @@ services:
     # ports:
     #   - "127.0.0.1:${REDIS_PORT:-6379}:6379"
     volumes:
-      - ./redis_data:/data
+      - /var/lib/redis_data:/data
     command: redis-server --save 60 1 --appendonly yes --appendfsync everysec
     networks:
       - dokploy-network
